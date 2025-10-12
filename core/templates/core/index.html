@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Django Localhost Demo</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 2rem; }
+.card { border: 1px solid #ddd; padding: 1rem; border-radius: 8px; max-width: 600px; }
+button { padding: 0.5rem 1rem; margin-top: 1rem; cursor: pointer; }
+pre { background:#f7f7f7; padding:1rem; border-radius:6px; }
+</style>
+</head>
+<body>
+<div class="card">
+<h1>Django + HTML/CSS/JS on localhost</h1>
+<p>This page will call <code>/api/hello</code> and display the JSON response below.</p>
+<button id="callApi">Call API</button>
+<h3>Response:</h3>
+<pre id="result">(no response yet)</pre>
+</div>
+
+
+<script>
+document.getElementById('callApi').addEventListener('click', async () => {
+const resultEl = document.getElementById('result');
+resultEl.textContent = 'Loading...';
+try {
+const res = await fetch('/api/hello');
+if (!res.ok) throw new Error('HTTP ' + res.status);
+const data = await res.json();
+resultEl.textContent = JSON.stringify(data, null, 2);
+} catch (err) {
+resultEl.textContent = 'Error: ' + err.message;
+}
+});
+</script>
+</body>
+</html>
