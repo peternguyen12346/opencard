@@ -9,4 +9,4 @@ python manage.py migrate
 python manage.py collectstatic --noinput
 
 # Khởi động Django server bằng gunicorn (Render yêu cầu chạy theo cổng môi trường PORT)
-gunicorn your_project_name.wsgi:application --bind 0.0.0.0:$PORT
+gunicorn opencard.wsgi:application --bind 0.0.0.0:$PORT
