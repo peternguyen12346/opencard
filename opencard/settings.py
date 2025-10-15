@@ -1,10 +1,12 @@
 from pathlib import Path
 import dj_database_url
 import os
+from dotenv import load_dotenv
+load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-change-me-for-prod'
 DEBUG = True
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.4']
 
 
 INSTALLED_APPS = [
@@ -16,7 +18,8 @@ INSTALLED_APPS = [
 'django.contrib.staticfiles',
 'core',
 ]
-
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'core', 'static')]
 
 MIDDLEWARE = [
 'django.middleware.security.SecurityMiddleware',

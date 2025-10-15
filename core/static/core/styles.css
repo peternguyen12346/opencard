@@ -1,0 +1,31 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 2rem;
+  background: #fafafa;
+}
+.card {
+  border: 1px solid #ddd;
+  padding: 1.5rem;
+  border-radius: 10px;
+  max-width: 600px;
+  background: #fff;
+}
+button {
+  padding: 0.6rem 1.2rem;
+  margin-top: 1rem;
+  cursor: pointer;
+  border: none;
+  border-radius: 6px;
+  background: #007bff;
+  color: white;
+  font-size: 1rem;
+}
+button:hover {
+  background: #0056b3;
+}
+pre {
+  background: #f7f7f7;
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
