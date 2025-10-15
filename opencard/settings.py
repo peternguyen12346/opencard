@@ -6,7 +6,7 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-change-me-for-prod'
 DEBUG = True
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.4']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '192.168.1.4','opencard.onrender.com']
 
 
 INSTALLED_APPS = [
