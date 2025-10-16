@@ -23,45 +23,44 @@ window.addEventListener("DOMContentLoaded", function () {
 
   // Nút đăng nhập
   authBtn.addEventListener("click", async () => {
-    console.log("🟢 Nút đăng nhập được nhấn");
-    try {
-      const scopes = ["payments"];
-      const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
-      currentUser = auth.user;
-      resultEl.textContent = "✅ Đăng nhập thành công:\n" + JSON.stringify(currentUser, null, 2);
-      payBtn.disabled = false;
-    } catch (error) {
-      console.error("❌ Lỗi đăng nhập:", error);
-      resultEl.textContent = "Lỗi đăng nhập: " + error.message;
-    }
-  });
+      if (!currentUser) {
+    alert("Bạn cần đăng nhập trước!");
+    return;
+  }
 
-  // Nút thanh toán
-  payBtn.addEventListener("click", async () => {
-    if (!currentUser) {
-      alert("Bạn cần đăng nhập trước!");
-      return;
-    }
+  try {
+    resultEl.textContent = "Đang tạo giao dịch...";
+    const uid = currentUser.uid;
+    const amount = 1.0;
 
-    try {
-      resultEl.textContent = "⏳ Đang tạo giao dịch...";
-      const uid = currentUser.uid;
-      const amount = 1.0;
-      const res = await fetch(`/start-payment/?uid=${uid}&amount=${amount}`);
-      if (!res.ok) throw new Error("Lỗi HTTP " + res.status);
+    // Gọi backend nếu cần
+    const res = await fetch(`/start-payment/?uid=${uid}&amount=${amount}`);
+    if (!res.ok) throw new Error("Lỗi HTTP " + res.status);
 
-      const data = await res.json();
-      resultEl.textContent = "📦 Yêu cầu thanh toán:\n" + JSON.stringify(data, null, 2);
+    const data = await res.json();
+    resultEl.textContent = "Yêu cầu thanh toán:\n" + JSON.stringify(data, null, 2);
 
-      await Pi.createPayment({
-        amount: amount,
-        memo: "Test payment with Pi",
-        metadata: { purpose: "demo" },
-      });
-    } catch (err) {
-      console.error("❌ Lỗi thanh toán:", err);
-      resultEl.textContent = "Lỗi thanh toán: " + err.message;
-    }
+    // Thực hiện thanh toán
+    await Pi.createPayment({
+      amount: amount,
+      memo: "Test payment with Pi",
+      metadata: { purpose: "demo" },
+      onComplete: function(payment) {
+        console.log("✅ Thanh toán hoàn tất:", payment);
+        resultEl.textContent = "Thanh toán thành công:\n" + JSON.stringify(payment, null, 2);
+      },
+      onError: function(error) {
+        console.error("❌ Lỗi thanh toán:", error);
+        resultEl.textContent = "Lỗi thanh toán: " + error.message;
+      },
+      onCancel: function() {
+        console.log("⚠ Người dùng hủy thanh toán");
+        resultEl.textContent = "Người dùng hủy thanh toán";
+      }
+    });
+  } catch (err) {
+    resultEl.textContent = "Lỗi thanh toán: " + err.message;
+  }
   });
 
   function onIncompletePaymentFound(payment) {
