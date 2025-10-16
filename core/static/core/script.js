@@ -59,20 +59,17 @@ window.addEventListener("DOMContentLoaded", function () {
       // console.log("Payment request từ server:", data);
 
       await Pi.createPayment({
-        amount: amount,
+        amount: 1.0,
         memo: "Thanh toán 1 Pi",
         metadata: { purpose: "demo" },
         onComplete: function(payment) {
           console.log("✅ Thanh toán thành công:", payment);
-          resultEl.textContent = "Thanh toán thành công:\n" + JSON.stringify(payment, null, 2);
         },
         onError: function(error) {
           console.error("❌ Lỗi thanh toán:", error);
-          resultEl.textContent = "Lỗi thanh toán: " + error.message;
         },
         onCancel: function() {
           console.log("⚠ Người dùng hủy thanh toán");
-          resultEl.textContent = "Người dùng hủy thanh toán";
         }
       });
     } catch (err) {
