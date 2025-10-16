@@ -1,84 +1,69 @@
-window.addEventListener("DOMContentLoaded", async function () {
-    if (typeof Pi === "undefined") {
-        alert("❌ Pi SDK chưa được tải!");
-        console.error("Pi SDK is undefined!");
+window.addEventListener("DOMContentLoaded", async function() {
+    if (typeof Pi === 'undefined') {
+        alert('Pi SDK chưa được tải!');
         return;
     }
 
-  await Pi.init({ version: "2.0" }) // note await
-  console.log("✅ Pi SDK initialized!");
+    await Pi.init({ version: "2.0" }); // ✅ đúng chuẩn
+    console.log("Pi SDK initialized!");
 
-  const resultEl = document.getElementById("result");
-  const authBtn = document.getElementById("authBtn");
-  const payBtn = document.getElementById("payBtn");
+    const authBtn = document.getElementById("authBtn");
+    const payBtn = document.getElementById("payBtn");
+    const resultEl = document.getElementById("result");
+    let currentUser = null;
 
-  if (!authBtn || !payBtn) {
-    console.error("❌ Không tìm thấy nút authBtn hoặc payBtn trong DOM!");
-    return;
-  }
+    // Đăng nhập
+    authBtn.addEventListener("click", async () => {
+        try {
+            const auth = await Pi.authenticate(["payments"], onIncompletePaymentFound);
+            currentUser = auth.user;
+            resultEl.textContent = "Đăng nhập thành công:\n" + JSON.stringify(currentUser, null, 2);
+            payBtn.disabled = false;
+        } catch (err) {
+            resultEl.textContent = "Lỗi đăng nhập: " + err.message;
+        }
+    });
 
-  let currentUser = null;
+    // Thanh toán 1 Pi
+    payBtn.addEventListener("click", async () => {
+        if (!currentUser) {
+            alert("Bạn cần đăng nhập trước!");
+            return;
+        }
 
-  // --- Nút đăng nhập ---
-  authBtn.addEventListener("click", async () => {
-    try {
-      console.log("🔹 Đang nhấn đăng nhập Pi...");
-      const scopes = ["payments"];
-      const auth = await Pi.authenticate(scopes, onIncompletePaymentFound);
-      currentUser = auth.user;
-      console.log("✅ Đăng nhập thành công:", currentUser);
-      resultEl.textContent = "Đăng nhập thành công:\n" + JSON.stringify(currentUser, null, 2);
-      payBtn.disabled = false;
-    } catch (error) {
-      console.error("❌ Lỗi đăng nhập:", error);
-      resultEl.textContent = "Lỗi đăng nhập: " + error.message;
+        const paymentData = {
+            amount: 1,
+            memo: "Thanh toán thử nghiệm 1 Pi",
+            metadata: { InternalPaymentID: 1234 },
+        };
+
+        const paymentCallbacks = {
+            onReadyForServerApproval: function(paymentId) {
+                console.log("🟢 Ready for server approval:", paymentId);
+            },
+            onReadyForServerCompletion: function(paymentId, txid) {
+                console.log("✅ Payment completed:", paymentId, txid);
+                resultEl.textContent = `Thanh toán thành công! PaymentID: ${paymentId}, TxID: ${txid}`;
+            },
+            onCancel: function(paymentId) {
+                console.log("⚠ Người dùng hủy thanh toán:", paymentId);
+                resultEl.textContent = "Người dùng hủy thanh toán";
+            },
+            onError: function(error, payment) {
+                console.error("❌ Lỗi thanh toán:", error, payment);
+                resultEl.textContent = "Lỗi thanh toán: " + error.message;
+            }
+        };
+
+        try {
+            await Pi.createPayment(paymentData, paymentCallbacks);
+        } catch (err) {
+            console.error(err);
+            resultEl.textContent = "Lỗi gọi Pi.createPayment: " + err.message;
+        }
+    });
+
+    function onIncompletePaymentFound(payment) {
+        console.log("🔁 Giao dịch chưa hoàn tất:", payment);
     }
-  });
-
-  // --- Nút thanh toán 1 Pi ---
-  payBtn.addEventListener("click", async () => {
-    if (!currentUser) {
-      alert("Bạn cần đăng nhập trước!");
-      return;
-    }
-
-    try {
-      const uid = currentUser.uid;
-      const amount = 1.0;
-
-      // Nếu backend cần tạo payment request
-      const res = await fetch(`/start-payment/?uid=${uid}&amount=${amount}`);
-      if (!res.ok) throw new Error("Lỗi HTTP " + res.status);
-      const data = await res.json();
-      console.log("📄 Yêu cầu thanh toán từ server:", data);
-      resultEl.textContent = "Yêu cầu thanh toán:\n" + JSON.stringify(data, null, 2);
-
-      // Thực hiện thanh toán Pi
-      await Pi.createPayment({
-        amount: amount,
-        memo: "Thanh toán 1 Pi",
-        metadata: { purpose: "demo" },
-        onComplete: function (payment) {
-          console.log("✅ Thanh toán thành công:", payment);
-          resultEl.textContent = "Thanh toán thành công:\n" + JSON.stringify(payment, null, 2);
-        },
-        onError: function (error) {
-          console.error("❌ Lỗi thanh toán:", error);
-          resultEl.textContent = "Lỗi thanh toán: " + error.message;
-        },
-        onCancel: function () {
-          console.log("⚠ Người dùng hủy thanh toán");
-          resultEl.textContent = "Người dùng hủy thanh toán";
-        },
-      });
-    } catch (err) {
-      console.error("❌ Lỗi thanh toán:", err);
-      resultEl.textContent = "Lỗi thanh toán: " + err.message;
-    }
-  });
-
-  // Callback cho giao dịch chưa hoàn tất
-  function onIncompletePaymentFound(payment) {
-    console.log("🔁 Giao dịch chưa hoàn tất:", payment);
-  }
 });
