@@ -1,13 +1,11 @@
-window.addEventListener("DOMContentLoaded", function () {
-  console.log("✅ DOM loaded!");
+window.addEventListener("DOMContentLoaded", async function () {
+    if (typeof Pi === "undefined") {
+        alert("❌ Pi SDK chưa được tải!");
+        console.error("Pi SDK is undefined!");
+        return;
+    }
 
-  if (typeof Pi === "undefined") {
-    alert("❌ Pi SDK chưa được tải!");
-    console.error("Pi SDK is undefined!");
-    return;
-  }
-
-  await Pi.init({ version: "2.0" }); // note await
+  await Pi.init({ version: "2.0" }) // note await
   console.log("✅ Pi SDK initialized!");
 
   const resultEl = document.getElementById("result");
