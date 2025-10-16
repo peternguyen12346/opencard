@@ -8,6 +8,7 @@ window.addEventListener("DOMContentLoaded", async () => {
   }
 
   await Pi.init({ version: "2.0" });
+  alert("✅ Pi SDK đã được init!");
   console.log("✅ Pi SDK initialized!", Pi);
 
   const resultEl = document.getElementById("result");
@@ -45,9 +46,7 @@ window.addEventListener("DOMContentLoaded", async () => {
 
     const paymentCallbacks = {
       // Khi Pi SDK yêu cầu backend approve
-      onReadyForServerApproval: function (paymentId) {
-        console.log("🔹 Approval requested:", paymentId);
-        // Để demo, approve ngay lập tức
+      onReadyForServerApproval: function (paymentId) { // Để demo, approve ngay lập tức
         Pi.approvePayment(paymentId)
           .then(() => {
             console.log("✅ Payment approved on server side");
