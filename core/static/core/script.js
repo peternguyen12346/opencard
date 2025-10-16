@@ -7,8 +7,8 @@ window.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  Pi.init({ version: "2.0" });
-  console.log("✅ Pi SDK initialized!", Pi);
+  await Pi.init({ version: "2.0" }); // note await
+  console.log("✅ Pi SDK initialized!");
 
   const resultEl = document.getElementById("result");
   const authBtn = document.getElementById("authBtn");
