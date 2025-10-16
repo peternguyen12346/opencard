@@ -75,7 +75,7 @@ window.addEventListener("DOMContentLoaded", async () => {
     };
 
     try {
-      await Pi.createPayment(paymentData, paymentCallbacks);
+       Pi.createPayment(paymentData, paymentCallbacks);
     } catch (err) {
       console.error("❌ Pi.createPayment failed:", err);
       resultEl.textContent = "Lỗi thanh toán: " + err.message;
